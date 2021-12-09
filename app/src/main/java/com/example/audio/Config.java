@@ -9,7 +9,7 @@ public class Config {
     public static final int SAMPLE_RATE_INHZ = 44100;
 
     /**
-     * 声道数。CHANNEL_IN_MONO and CHANNEL_IN_STEREO. 其中CHANNEL_IN_MONO是可以保证在所有设备能够使用的。
+     * 声道数。CHANNEL_IN_MONO (单通道) and CHANNEL_IN_STEREO（双通道）. 其中CHANNEL_IN_MONO是可以保证在所有设备能够使用的。
      */
     public static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
 

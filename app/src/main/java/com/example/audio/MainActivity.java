@@ -77,6 +77,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mAudioRecord != null) {
+            mAudioRecord.release();
+            mAudioRecord = null;
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_record:
@@ -139,8 +148,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             file.delete();
         }
 
+        //在AudioRecord对象构造完毕之后，就处于AudioRecord.STATE_INITIALIZED状态了。
+        if (mAudioRecord.getState() == AudioRecord.STATE_UNINITIALIZED) {
+            Log.e(TAG, "状态异常，录制失败");
+            return;
+        }
         //开始录音
         mAudioRecord.startRecording();
+        //用来开始/停止获取录音数据
         mIsRecording = true;
 
         new Thread(new Runnable() {
@@ -186,8 +201,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void stopRecord() {
         mIsRecording = false;
         if (mAudioRecord != null) {
-            mAudioRecord.stop();
-            mAudioRecord.release();
+            if (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
+                mAudioRecord.stop();
+            }
+            if (mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                mAudioRecord.release();
+            }
             mAudioRecord = null;
         }
     }
@@ -210,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 播放，使用stream模式
      */
     private void playInModeStream() {
-
         mPlayTask = new PlayInModeStreamTask(this);
         mPlayTask.execute();
     }
